@@ -25,6 +25,11 @@ public class PersonaController {
         return ResponseEntity.ok(personaService.listar());
     }
 
+    @GetMapping("/nombre")
+    public ResponseEntity<List<PersonaResponse>> obtenerPorNombre(@RequestParam String nombre){
+        return ResponseEntity.ok(personaService.obtenerPorNombre(nombre));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PersonaResponse> obtenerPorId(@PathVariable
                                                             @Positive(message = "El id debe ser positivo") Long id){

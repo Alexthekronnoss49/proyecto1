@@ -8,6 +8,8 @@ import java.util.List;
 public interface PersonaService {
     List<PersonaResponse> listar();
 
+    List<PersonaResponse> obtenerPorNombre(String nombre);
+
     PersonaResponse obtenerPorId(Long id);
 
     PersonaResponse registrar(PersonaRequest request);

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -29,6 +30,15 @@ public class PersonaServiceImpl implements PersonaService{
     public List<PersonaResponse> listar() {
         log.info("listado de todas las personas solicitado");
         return personaRepository.findAll()
+                .stream()
+                .map(personaMapper::entityToResponse).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PersonaResponse> obtenerPorNombre(String nombre) {
+        log.info("listado de todas las personas solicitado");
+        return personaRepository.findByNombreContainingIgnoreCase(nombre)
                 .stream()
                 .map(personaMapper::entityToResponse).toList();
     }
@@ -106,4 +116,5 @@ public class PersonaServiceImpl implements PersonaService{
                         obtenerPrimerosCaracteres(apellidoMaterno, 5)+ "@ejemplo.com"
                 ).toLowerCase();
     }
+
 }
