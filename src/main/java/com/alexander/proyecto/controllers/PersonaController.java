@@ -36,7 +36,8 @@ public class PersonaController {
     }
 
     @GetMapping("/edad")
-    public ResponseEntity<List<PersonaResponse>> obtenerPorRangoEdad(@RequestParam int edadInicio, @RequestParam int edadFin){
+    public ResponseEntity<List<PersonaResponse>> obtenerPorRangoEdad(@RequestParam @Positive(message = "la edad mínima debe ser positiva") Short edadInicio,
+                                                                     @RequestParam @Positive(message = "la edad máxima debe ser positiva") Short edadFin){
         return ResponseEntity.ok(personaService.obtenerPorRangoEdad(edadInicio, edadFin));
     }
 

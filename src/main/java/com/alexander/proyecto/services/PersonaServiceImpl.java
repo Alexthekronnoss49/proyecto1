@@ -54,7 +54,7 @@ public class PersonaServiceImpl implements PersonaService{
 
     @Override
     @Transactional(readOnly = true)
-    public List<PersonaResponse> obtenerPorRangoEdad(int edadInicio, int edadFin) {
+    public List<PersonaResponse> obtenerPorRangoEdad(Short edadInicio, Short edadFin) {
         return personaRepository.findByEdadBetween(edadInicio, edadFin)
                 .stream()
                 .map(personaMapper::entityToResponse).toList();
@@ -71,7 +71,8 @@ public class PersonaServiceImpl implements PersonaService{
     @Override
     @Transactional(readOnly = true)
     public List<PersonaResponse> obtenerPorGenero(Character genero){
-        return personaRepository.findByGeneroStartingWith(genero)
+        Genero generoEnum = Genero.obtenerPorAbreviacion(genero);
+        return personaRepository.findByGenero(generoEnum)
                 .stream()
                 .map(personaMapper::entityToResponse).toList();
     }
@@ -92,7 +93,7 @@ public class PersonaServiceImpl implements PersonaService{
                 request.apellidoPaterno(),
                 request.apellidoMaterno());
 
-        verificarTelefonoExiste(request.telefono());
+        validarTelefonoUnico(request.telefono());
 
         Persona persona = personaRepository.save(personaMapper.requestToEntity(request, genero, email));
         log.info("Nueva persona registrada: {}", persona.getNombre());
@@ -105,6 +106,9 @@ public class PersonaServiceImpl implements PersonaService{
         Persona persona = obtenerPersonaException(id);
 
         log.info("Actualizando persona con id: {}", id);
+
+        validarTelefonoUnicoActualizar(request.telefono(), id);
+
         persona.setNombre(request.nombre());
         persona.setApellidoPaterno(request.apellidoPaterno());
         persona.setApellidoMaterno(request.apellidoMaterno());
@@ -152,15 +156,17 @@ public class PersonaServiceImpl implements PersonaService{
                 ).toLowerCase();
     }
 
-    private Boolean verificarTelefonoExiste(String telefono){
-        if (obtenerPorTelefono(telefono).isEmpty()){
-            return true;
-        }else{
-            throw new NoSuchElementException("telefono ya existe");
+    private void validarTelefonoUnico(String telefono){
+        if (personaRepository.existsByTelefono(telefono)){
+            throw new IllegalArgumentException("Ya existe una persona registrada con el telefono "+ telefono);
         }
-
     }
 
+    private void validarTelefonoUnicoActualizar(String telefono, Long id){
+        if (personaRepository.existsByTelefonoAndIdNot(telefono, id)){
+            throw new IllegalArgumentException("Ya existe una persona registrada con el telefono "+ telefono);
+        }
+    }
 
 
 }
