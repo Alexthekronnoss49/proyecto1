@@ -11,9 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional
@@ -45,6 +45,39 @@ public class PersonaServiceImpl implements PersonaService{
 
     @Override
     @Transactional(readOnly = true)
+    public List<PersonaResponse> obtenerPorEmail(String email) {
+        log.info("listado de correos las personas solicitado");
+        return personaRepository.findByEmailContainingIgnoreCase(email)
+                .stream()
+                .map(personaMapper::entityToResponse).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PersonaResponse> obtenerPorRangoEdad(int edadInicio, int edadFin) {
+        return personaRepository.findByEdadBetween(edadInicio, edadFin)
+                .stream()
+                .map(personaMapper::entityToResponse).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PersonaResponse> obtenerPorTelefono(String telefono) {
+        return personaRepository.findByTelefono(telefono)
+                .stream()
+                .map(personaMapper::entityToResponse).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PersonaResponse> obtenerPorGenero(Character genero){
+        return personaRepository.findByGeneroStartingWith(genero)
+                .stream()
+                .map(personaMapper::entityToResponse).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public PersonaResponse obtenerPorId(Long id) {
         return personaMapper.entityToResponse(obtenerPersonaException(id));
     }
@@ -58,6 +91,8 @@ public class PersonaServiceImpl implements PersonaService{
         String email = generarEmail(request.nombre(),
                 request.apellidoPaterno(),
                 request.apellidoMaterno());
+
+        verificarTelefonoExiste(request.telefono());
 
         Persona persona = personaRepository.save(personaMapper.requestToEntity(request, genero, email));
         log.info("Nueva persona registrada: {}", persona.getNombre());
@@ -116,5 +151,16 @@ public class PersonaServiceImpl implements PersonaService{
                         obtenerPrimerosCaracteres(apellidoMaterno, 5)+ "@ejemplo.com"
                 ).toLowerCase();
     }
+
+    private Boolean verificarTelefonoExiste(String telefono){
+        if (obtenerPorTelefono(telefono).isEmpty()){
+            return true;
+        }else{
+            throw new NoSuchElementException("telefono ya existe");
+        }
+
+    }
+
+
 
 }

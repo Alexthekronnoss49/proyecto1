@@ -10,4 +10,12 @@ import java.util.List;
 public interface PersonaRepository extends JpaRepository<Persona, Long> {
 
     List<Persona> findByNombreContainingIgnoreCase(String nombre);
+
+    List<Persona> findByEmailContainingIgnoreCase(String email);
+
+    List<Persona> findByEdadBetween(int edadInicio, int edadFin);
+
+    List<Persona> findByTelefono(String telefono);
+
+    List<Persona> findByGeneroStartingWith(Character genero);
 }

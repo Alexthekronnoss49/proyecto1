@@ -30,6 +30,26 @@ public class PersonaController {
         return ResponseEntity.ok(personaService.obtenerPorNombre(nombre));
     }
 
+    @GetMapping("/email")
+    public ResponseEntity<List<PersonaResponse>> obtenerPorEmail(@RequestParam String email){
+        return ResponseEntity.ok(personaService.obtenerPorEmail(email));
+    }
+
+    @GetMapping("/edad")
+    public ResponseEntity<List<PersonaResponse>> obtenerPorRangoEdad(@RequestParam int edadInicio, @RequestParam int edadFin){
+        return ResponseEntity.ok(personaService.obtenerPorRangoEdad(edadInicio, edadFin));
+    }
+
+    @GetMapping("/telefono")
+    public ResponseEntity<List<PersonaResponse>> obtenerPorTelefono(@RequestParam String telefono){
+        return ResponseEntity.ok(personaService.obtenerPorTelefono(telefono));
+    }
+
+    @GetMapping("/genero")
+    public ResponseEntity<List<PersonaResponse>> obtenerPorGenero(@RequestParam Character genero){
+        return ResponseEntity.ok(personaService.obtenerPorGenero(genero));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PersonaResponse> obtenerPorId(@PathVariable
                                                             @Positive(message = "El id debe ser positivo") Long id){
